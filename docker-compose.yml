@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:16
+    container_name: habotdb
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: lsa_user
+      POSTGRES_PASSWORD: lsa_password
+      POSTGRES_DB: lsa_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - lsa_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  lsa_postgres_data:
