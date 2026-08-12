@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     DB_USER: str = "lsa_user"
     DB_PASSWORD: str = "lsa_password"
     DB_HOST: str = "localhost"
-    DB_PORT: int = 5433
+    DB_PORT: int = 5432
     DB_NAME: str = "lsa_db"
 
     #optional fields
