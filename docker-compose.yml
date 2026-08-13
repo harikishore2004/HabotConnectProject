@@ -11,6 +11,20 @@ services:
       - "5432:5432"
     volumes:
       - lsa_postgres_data:/var/lib/postgresql/data
+  app:
+    build: .
+    container_name: lsa_app
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+
 
 volumes:
   lsa_postgres_data:
