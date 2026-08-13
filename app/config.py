@@ -23,7 +23,9 @@ class Settings(BaseSettings):
     #optional fields
     DATABASE_URL: Optional[str] = None
     TEST_DATABASE_URL: Optional[str] = None
-
+    MOCK_PAYMENT_API_URL: Optional[str] = "http://localhost:5000/api/v1/mock/payment/"
+    MOCK_API_TIMEOUT_SECONDS: Optional[int] = 5
+    
     LOG_LEVEL: str = "INFO"
 
     # properties to build the DB URI for the postgres credentials

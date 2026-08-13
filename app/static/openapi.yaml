@@ -1,0 +1,167 @@
+openapi: 3.0.3
+info:
+  title: LSA Service Booking API
+  version: "1.0.0"
+  description: API for booking Learning Support Assistant (LSA) services.
+
+servers:
+  - url: /
+
+paths:
+  /api/v1/bookings/:
+    post:
+      summary: Create a booking request
+      tags: [Bookings]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookingRequestSchema"
+            example:
+              parent_id: 1
+              lsa_id: 1
+              session_date: "2026-09-01T10:00:00+00:00"
+              notes: "First session, please confirm timing."
+      responses:
+        "201":
+          description: Booking created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BookingResponseSchema"
+        "400":
+          description: Validation error (bad payload or invalid session_date)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Parent or LSA not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: LSA is not currently available
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "502":
+          description: Mock payment/verification service failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v1/lsas/search/:
+    get:
+      summary: Search available LSAs by skills
+      tags: [LSAs]
+      parameters:
+        - name: skills
+          in: query
+          required: false
+          description: Comma-separated list of skills, e.g. "Math,Reading"
+          schema:
+            type: string
+        - name: is_available
+          in: query
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Matching LSAs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                  results:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/LSAResponse"
+        "400":
+          description: Invalid query parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  schemas:
+    BookingRequestSchema:
+      type: object
+      required: [parent_id, lsa_id, session_date]
+      properties:
+        parent_id:
+          type: integer
+        lsa_id:
+          type: integer
+        session_date:
+          type: string
+          format: date-time
+          description: Must be a future, timezone-aware datetime.
+        notes:
+          type: string
+          nullable: true
+
+    BookingResponseSchema:
+      type: object
+      properties:
+        id:
+          type: integer
+        parent_id:
+          type: integer
+        lsa_id:
+          type: integer
+        session_date:
+          type: string
+        notes:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [pending, confirmed, cancelled, completed]
+        payment_reference:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+
+    LSAResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        full_name:
+          type: string
+        email:
+          type: string
+        bio:
+          type: string
+          nullable: true
+        is_available:
+          type: boolean
+        hourly_rate:
+          type: number
+        skills:
+          type: array
+          items:
+            type: string
+        created_at:
+          type: string
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        details:
+          type: array
+          items:
+            type: object
