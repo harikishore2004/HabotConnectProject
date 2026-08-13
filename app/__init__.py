@@ -1,6 +1,7 @@
 
 from flask import Flask
 import logging
+from flask_restful import Api
 from app.extensions import db
 from app.config import get_settings
 
@@ -20,7 +21,27 @@ def create_app(testing: bool = False) -> Flask:
     _configure_logging(app)
 
     db.init_app(app)
+    api = Api(app)
 
+    print("API initialized")
+
+    from app.routes.bookings import BookingListResource
+    from app.routes.lsa_search import LSASearchResource
+
+    print("Registering BookingListResource...")
+    api.add_resource(BookingListResource, "/api/v1/bookings/")
+
+    print("Registering LSASearchResource...")
+    api.add_resource(LSASearchResource, "/api/v1/lsas/search/")
+
+    print("After:", app.url_map)
+
+    from flask_swagger_ui import get_swaggerui_blueprint
+
+    swagger_bp = get_swaggerui_blueprint(
+        "/docs", "/static/openapi.yaml", config={"app_name": "LSA Booking API"}
+    )
+    app.register_blueprint(swagger_bp, url_prefix="/docs")
    
     from app.models import parent, booking, lsa_profile 
 
