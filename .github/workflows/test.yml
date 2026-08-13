@@ -1,0 +1,58 @@
+name: Run Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: lsa_user
+          POSTGRES_PASSWORD: lsa_password
+          POSTGRES_DB: lsa_db_test
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U lsa_user -d lsa_db_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests
+        env:
+          TEST_DATABASE_URL: postgresql+psycopg2://lsa_user:lsa_password@localhost:5433/lsa_db_test
+          MOCK_PAYMENT_API_URL: http://localhost:5000/api/v1/mock/payment/
+          LOG_LEVEL: INFO
+        run: |
+          pytest -v
+
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t lsa-booking-app .

@@ -25,14 +25,18 @@ def create_app(testing: bool = False) -> Flask:
 
     print("API initialized")
 
-    from app.routes.bookings import BookingListResource
-    from app.routes.lsa_search import LSASearchResource
+    from app.routes import BookingListResource
+    from app.routes import LSASearchResource
+    from app.routes import MockPaymentResource
 
     print("Registering BookingListResource...")
     api.add_resource(BookingListResource, "/api/v1/bookings/")
 
     print("Registering LSASearchResource...")
     api.add_resource(LSASearchResource, "/api/v1/lsas/search/")
+
+    print("Registering MockPaymentResource...")
+    api.add_resource(MockPaymentResource, "/api/v1/mock/payment/")
 
     print("After:", app.url_map)
 
