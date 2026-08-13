@@ -3,7 +3,7 @@ from pydantic import BaseModel, field_validator
 
 
 class LSASearchRequestchema(BaseModel):
-    skills: List[str]
+    skills: Optional[List[str]] = None
     is_available: Optional[bool] = None
 
     @field_validator("skills", mode="before")
