@@ -87,8 +87,8 @@ This starts both the PostgreSQL container and the Flask app. The app will be ava
 **Prerequisites:** Python 3.11+, a running PostgreSQL instance
 
 ```bash
-git clone <repository-url>
-cd lsa-booking-project
+git clone https://github.com/harikishore2004/HabotConnectProject.git
+cd HabotConnectProject
 python -m venv venv
 source venv/bin/activate      # Windows: venv\Scripts\activate
 pip install -r requirements.txt
